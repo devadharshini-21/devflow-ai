@@ -17,7 +17,7 @@ const app = express();
 
 // ================= MIDDLEWARE =================
 
-app.use(cors());
+app.use(cors({ origin: "https://devflow-ai-iota.vercel.app" }));
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
