@@ -1,7 +1,15 @@
 import axios from "axios";
 
+// Normalize the API base URL to ensure it always targets the /api route prefix
+// without creating duplicates like /api/api
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const cleanUrl = envUrl.trim().replace(/\/+$/, "");
+  return cleanUrl.endsWith("/api") ? cleanUrl : `${cleanUrl}/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: getBaseURL(),
   headers: {
     "Content-Type": "application/json",
   },

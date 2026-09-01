@@ -17,7 +17,40 @@ const app = express();
 
 // ================= MIDDLEWARE =================
 
-app.use(cors({ origin: "https://devflow-ai-iota.vercel.app" }));
+const allowedOrigins = [
+  "https://devflow-ai-iota.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+];
+
+if (process.env.CLIENT_URL) {
+  const customClientUrl = process.env.CLIENT_URL.trim().replace(/\/+$/, "");
+  if (customClientUrl && !allowedOrigins.includes(customClientUrl)) {
+    allowedOrigins.push(customClientUrl);
+  }
+}
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, Postman, health checks)
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.replace(/\/+$/, "");
+      if (
+        allowedOrigins.includes(normalizedOrigin) ||
+        allowedOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
